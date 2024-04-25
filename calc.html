@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basic Calculator</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .calculator {
+        width: 420px;
+        margin: 50px auto;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        box-shadow: 0px 0px 10px 0px #aaa;
+    }
+    .screen {
+        font-size: 30px;
+        width: 100%;
+        height: 60px;
+        margin-bottom: 10px;
+        text-align: right;
+        padding: 12.5px 15px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+    .btn {
+        width: 70px;
+        height: 70px;
+        margin: 5px;
+        font-size: 20px;
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+    .btn.operator {
+        background-color: #f1f1f1;
+    }
+    .btn.clear {
+        background-color: #ff6666;
+        color: #fff;
+    }
+    .btn.memory{
+        background-color: #aaa;
+    }
+    .memoryy{
+        font-weight: bolder;
+        position: absolute;
+        font-size: 8px;
+        display: flex;
+        padding: 2px;
+        gap: 5px;
+    }
+    .m{
+        display: none;
+        border-radius: 2px;
+        padding: 3px;
+        background-color: black;
+        color: white;
+    }
+</style>
+</head>
+<body>
+<div class="calculator">
+    <div class="memoryy">
+        <div class="mrecall m">MR</div>
+        <div class="mplus m">M+</div>
+        <div class="mminus m">M-</div>
+    </div>
+    <div class="screen" id="screen">0</div>
+    <button class="btn memory" onclick="memoryRecall()">MR</button>
+    <button class="btn memory" onclick="memoryAdd()">M+</button>
+    <button class="btn operator" onclick="addToScreen('√')">√</button>
+    <button class="btn operator" onclick="addToScreen('%')">%</button>
+    <button class="btn power" onclick="power()">On</button>
+    <button class="btn memory" onclick="memorySubtract()">M-</button>
+    <button class="btn" onclick="addToScreen('7')">7</button>
+    <button class="btn" onclick="addToScreen('8')">8</button>
+    <button class="btn" onclick="addToScreen('9')">9</button>
+    <button class="btn operator" onclick="addToScreen('÷')">÷</button>
+    <button class="btn memory" onclick="memoryClear()">MC</button>
+    <button class="btn" onclick="addToScreen('4')">4</button>
+    <button class="btn" onclick="addToScreen('5')">5</button>
+    <button class="btn" onclick="addToScreen('6')">6</button>
+    <button class="btn operator" onclick="addToScreen('x')">x</button>
+    <button class="btn clear" onclick="clearScreen()">AC</button>
+    <button class="btn" onclick="addToScreen('1')">1</button>
+    <button class="btn" onclick="addToScreen('2')">2</button>
+    <button class="btn" onclick="addToScreen('3')">3</button>
+    <button class="btn operator" onclick="addToScreen('-')">-</button>
+    <button class="btn clear" onclick="clearLast()">CE</button>
+    <button class="btn" onclick="addToScreen('0')">0</button>
+    <button class="btn" onclick="addToScreen('.')">.</button>
+    <button class="btn operator" onclick="calculate()">=</button>
+    <button class="btn operator" onclick="addToScreen('+')">+</button>
+</div>
+
+<script>
+    let screen = document.getElementById('screen');
+    let memoryIsClicked = false;
+
+function addToScreen(value) {
+
+    if(memoryIsClicked === true){
+        screen.innerText = '';
+        memoryIsClicked =  false;
+    }
+
+    // Check if the value is a decimal point and if there's already one on the screen
+    if (value === '.' && screen.innerText.includes('.')) {
+        return; // Do nothing if there's already a decimal point
+    }
+
+    // If the current value is 0 and the value being added is not a decimal point, replace the 0
+    if (screen.innerText === '0' && value !== '.') {
+        screen.innerText = '';
+    }
+
+    // Add the value to the screen
+    screen.innerText += value;
+}
+
+function calculate() {
+    // Get the input expression
+    let expression = screen.innerText;
+
+    // Replace all occurrences of '%' with '/100' for evaluation
+    expression = expression.replace(/%/g, '/100');
+    expression = expression.replace(/x/g, '*');
+    expression = expression.replace(/÷/g, '/');
+
+    // Regular expression to match square root followed by a number
+    let sqrtRegex = /√(\d+\.?\d*)/g;
+
+    // Replace square roots with their calculated values
+    expression = expression.replace(sqrtRegex, (match, number) => {
+    return Math.sqrt(parseFloat(number));
+    });
+
+    // Evaluate the expression
+    try {
+        // Evaluate the modified expression
+        let result = eval(expression);
+
+        // Update the screen with the result
+        screen.innerText = result;
+    } catch (error) {
+        // Show 'Error' if evaluation fails
+        screen.innerText = 'Error';
+    }
+}
+
+
+//for AC function
+function clearScreen() {
+        //clears the screen and show 0
+        screen.innerText = '0';
+    }
+
+//for CE function
+    function clearLast() {
+    // Get the current text char of the screen
+    let currentText = screen.innerText;
+
+    // Remove the last char from the text content
+    let newText = currentText.slice(0, -1);
+
+    // Update the screen with the new text content
+    screen.innerText = newText;
+
+    // If the screen becomes empty, reset it to '0'
+    if (newText === '') {
+        screen.innerText = '0';
+    }
+}
+
+function squareRoot() {
+    // Extract the number from the screen
+    let number = parseFloat(screen.innerText);
+
+    // Check if the number is valid
+    if (!isNaN(number)) {
+        // Calculate the square root
+        let result = Math.sqrt(number);
+        
+        // Update the screen with the result
+        screen.innerText = result;
+    } else {
+        // If the number is not valid, show an error
+        screen.innerText = 'Error';
+    }
+}
+
+let memory = 0;
+function memoryAdd() {
+    var mplusElement = document.querySelector('.mplus');
+    var mminusElement = document.querySelector('.mminus');
+    var mrecallElement = document.querySelector('.mrecall');
+    mplusElement.style.display = 'block';
+    mminusElement.style.display = 'none';
+    mrecallElement.style.display = 'none';
+
+    let currentText = parseFloat(screen.innerText);
+    if (!isNaN(currentText) || screen.innerText === '.') {
+        memory += currentText;
+    }
+
+    memoryIsClicked =  true;
+
+}
+
+function memorySubtract() {
+    var mplusElement = document.querySelector('.mplus');
+    var mminusElement = document.querySelector('.mminus');
+    var mrecallElement = document.querySelector('.mrecall');
+    mplusElement.style.display = 'none';
+    mminusElement.style.display = 'block';
+    mrecallElement.style.display = 'none';
+
+    let currentText = parseFloat(screen.innerText);
+    if (!isNaN(currentText) || screen.innerText === '.') {
+        memory -= currentText;
+    }
+
+    memoryIsClicked =  true;
+}
+
+function memoryRecall() {
+    var mplusElement = document.querySelector('.mplus');
+    var mminusElement = document.querySelector('.mminus');
+    var mrecallElement = document.querySelector('.mrecall');
+    mplusElement.style.display = 'none';
+    mminusElement.style.display = 'none';
+    mrecallElement.style.display = 'block';
+
+    screen.innerText = memory;
+
+    memoryIsClicked =  true;
+}
+
+function memoryClear() {
+    var mplusElement = document.querySelector('.mplus');
+    var mminusElement = document.querySelector('.mminus');
+    var mrecallElement = document.querySelector('.mrecall');
+    mplusElement.style.display = 'none';
+    mminusElement.style.display = 'none';
+    mrecallElement.style.display = 'none';
+
+    memory = 0;
+
+    memoryIsClicked =  true;
+}
+
+function power() {
+            var powerButton = document.querySelector('.power');
+            var buttons = document.querySelectorAll('.btn:not(.power)');
+            var currentState = powerButton.textContent.trim();
+            
+            if (currentState === 'On') {
+                powerButton.textContent = 'Off';
+                buttons.forEach(function(button) {
+                    button.disabled = true;
+                    screen.innerText = '';
+                    memory = 0;
+                });
+            } else {
+                powerButton.textContent = 'On';
+                buttons.forEach(function(button) {
+                    button.disabled = false;
+                    screen.innerText = '0';
+                });
+            }
+        }
+
+
+</script>
+
+</body>
+</html>
